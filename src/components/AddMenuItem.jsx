@@ -24,21 +24,52 @@ function AddMenuItem() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-md mx-auto">
-      <div className="mb-4">
-        <label className="block text-gray-700">Name</label>
-        <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="w-full border p-2" required />
-      </div>
-      <div className="mb-4">
-        <label className="block text-gray-700">Price</label>
-        <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} className="w-full border p-2" required />
-      </div>
-      <div className="mb-4">
-        <label className="block text-gray-700">Image</label>
-        <input type="file" onChange={(e) => setImage(e.target.files[0])} className="w-full" required />
-      </div>
-      <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded">Add Item</button>
-    </form>
+    <div className="bg-beige-100 flex justify-center items-center min-h-screen">
+      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full">
+        <h2 className="text-3xl font-semibold text-center text-brown-800 mb-6">เพิ่มรายการเมนู</h2>
+        
+        <div className="mb-4">
+          <label className="block text-gray-700 font-medium mb-2">ชื่อรายการ</label>
+          <input 
+            type="text" 
+            value={name} 
+            onChange={(e) => setName(e.target.value)} 
+            className="w-full border border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500" 
+            required 
+            placeholder="ชื่อเมนู"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-gray-700 font-medium mb-2">ราคา</label>
+          <input 
+            type="number" 
+            value={price} 
+            onChange={(e) => setPrice(e.target.value)} 
+            className="w-full border border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500" 
+            required 
+            placeholder="ราคา"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-gray-700 font-medium mb-2">อัปโหลดรูปภาพ</label>
+          <input 
+            type="file" 
+            onChange={(e) => setImage(e.target.files[0])} 
+            className="w-full text-gray-700 border border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500" 
+            required 
+          />
+        </div>
+
+        <button 
+          type="submit" 
+          className="w-full bg-green-500 text-white p-3 rounded-md text-xl hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+        >
+          เพิ่มรายการ
+        </button>
+      </form>
+    </div>
   );
 }
 

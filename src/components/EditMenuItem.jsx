@@ -42,18 +42,18 @@ function EditMenuItem() {
   return (
     <form onSubmit={handleSubmit} className="max-w-md mx-auto">
       <div className="mb-4">
-        <label className="block text-gray-700">Name</label>
+        <label className="block text-gray-700">ชื่อรายการ</label>
         <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="w-full border p-2" required />
       </div>
       <div className="mb-4">
-        <label className="block text-gray-700">Price</label>
+        <label className="block text-gray-700">ราคา</label>
         <input type="number" value={price} onChange={(e) => setPrice(e.target.value)} className="w-full border p-2" required />
       </div>
       <div className="mb-4">
-        <label className="block text-gray-700">Image</label>
+        <label className="block text-gray-700">รูปภาพ</label>
         <input type="file" onChange={(e) => setImage(e.target.files[0])} className="w-full" />
       </div>
-      <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">Update Item</button>
+      <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">ยืนยันรายการแก้ไข</button>
     </form>
   );
 }
