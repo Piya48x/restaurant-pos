@@ -6,6 +6,7 @@ import EditMenuItem from './components/EditMenuItem';
 import Navbar from './components/Navbar';
 import HomePage from './components/HomePage';
 import MenuPage from './components/MenuPage';
+import OrderPage from './components/OrderPage';
 
 
 function App() {
@@ -24,6 +25,8 @@ function App() {
             <Route path="/edit/:id" element={<EditMenuItem />} />
             <Route path="/HomePage" element={<HomePage />} />
             <Route path="/menu" element={<MenuPage />} />
+            <Route path="/order" element={<OrderPage />} />
+
            
           </Routes>
         </div>

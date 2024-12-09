@@ -48,7 +48,7 @@ function MenuList() {
             />
             <div className="p-4">
               <h2 className="text-2xl font-bold text-gray-800">{item.name}</h2>
-              <p className="text-gray-600 text-lg mt-2">${item.price.toFixed(2)}</p>
+              <p className="text-gray-600 text-lg mt-2">{item.price.toFixed(2)} บาท</p>
               <div className="mt-4 flex space-x-2">
                 <Link 
                   to={`/edit/${item.id}`} 

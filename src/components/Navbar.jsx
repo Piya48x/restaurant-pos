@@ -46,6 +46,12 @@ function Navbar() {
         >
           เข้าสู่ระบบ
         </Link>
+        <Link 
+          to="/order" 
+          className="transition-colors duration-200 hover:text-yellow-400 hover:underline focus:text-yellow-400"
+        >
+          รายการอาหาร
+        </Link>
       </div>
     </nav>
   );
