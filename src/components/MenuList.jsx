@@ -29,12 +29,7 @@ function MenuList() {
 
   return (
     <div className="bg-beige-100 container mx-auto px-4 py-6">
-      {/* <Link 
-        to="/add" 
-        className="bg-blue-500 text-white px-6 py-3 rounded-lg mb-6 inline-block font-semibold shadow-lg hover:bg-blue-600 transition-colors duration-300"
-      >
-        เพิ่มรายการเมนู
-      </Link> */}
+      
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {menuItems.map((item) => (
           <div 
@@ -64,9 +59,17 @@ function MenuList() {
                 </button>
               </div>
             </div>
+            
           </div>
+          
         ))}
       </div>
+      <Link 
+        to="/add" 
+        className="mt-4 ml-4 bg-blue-500 text-white px-6 py-3 rounded-lg mb-6 inline-block font-semibold shadow-lg hover:bg-blue-600 transition-colors duration-300"
+      >
+        เพิ่มรายการเมนู
+      </Link>
     </div>
   );
 }
