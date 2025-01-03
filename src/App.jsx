@@ -7,6 +7,7 @@ import Navbar from './components/Navbar';
 import HomePage from './components/HomePage';
 import MenuPage from './components/MenuPage';
 import OrderPage from './components/OrderPage';
+import EditMenuPopup from './components/EditMenuPopup';
 
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
             <Route path="/HomePage" element={<HomePage />} />
             <Route path="/menu" element={<MenuPage />} />
             <Route path="/order" element={<OrderPage />} />
+            <Route path="/EditMenuPopup" element={<EditMenuPopup />} />
 
            
           </Routes>

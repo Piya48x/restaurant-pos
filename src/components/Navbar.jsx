@@ -26,7 +26,7 @@ function Navbar() {
           to="/order" 
           className="transition-colors duration-200 hover:text-yellow-400 hover:underline focus:text-yellow-400"
         >
-          สั่งอาหาร
+          รายการอาหาร
         </Link>
         <Link 
           to="/HomePage" 
@@ -40,18 +40,18 @@ function Navbar() {
         >
           ติดต่อเรา
         </Link>
-        <Link 
+        {/* <Link 
           to="/login" 
           className="transition-colors duration-200 hover:text-yellow-400 hover:underline focus:text-yellow-400"
         >
           เข้าสู่ระบบ
-        </Link>
-        <Link 
+        </Link> */}
+        {/* <Link 
           to="/order" 
           className="transition-colors duration-200 hover:text-yellow-400 hover:underline focus:text-yellow-400"
         >
           รายการอาหาร
-        </Link>
+        </Link> */}
       </div>
     </nav>
   );
