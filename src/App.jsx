@@ -8,6 +8,7 @@ import HomePage from './components/HomePage';
 import MenuPage from './components/MenuPage';
 import OrderPage from './components/OrderPage';
 import EditMenuPopup from './components/EditMenuPopup';
+import TradingChart from './components/TradingChart';
 
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
             <Route path="/menu" element={<MenuPage />} />
             <Route path="/order" element={<OrderPage />} />
             <Route path="/EditMenuPopup" element={<EditMenuPopup />} />
+            <Route path="/TradingChart" element={<TradingChart />} />
 
            
           </Routes>

@@ -17,50 +17,90 @@ function MenuList() {
   const [filteredItems, setFilteredItems] = useState([]);
   const [isEditPopupOpen, setIsEditPopupOpen] = useState(false);
   const [selectedMenu, setSelectedMenu] = useState(null);
+  const [editingItem, setEditingItem] = useState(null);
 
   useEffect(() => {
-    fetchMenuItems();
-  }, [selectedCategory]);
+    fetchMenuItems(); // โหลดเมนูเริ่มต้น
+  }, []);
 
-  const fetchMenuItems = async () => {
+  const handleCategoryChange = (e) => {
+    setSelectedCategory(e.target.value);
+  };
+  
+  useEffect(() => {
+    let filtered = menuItems;
+  
+    // กรองตามหมวดหมู่ (ถ้ามีการเลือก)
+    if (selectedCategory) {
+      filtered = filtered.filter((item) => item.category === selectedCategory);
+    }
+  
+    // กรองตามคำค้นหา
+    if (searchQuery) {
+      filtered = filtered.filter((item) =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+  
+    setFilteredItems(filtered);
+  }, [selectedCategory, searchQuery, menuItems]);
+
+
+  const fetchMenuItems = async (search = '') => {
     try {
-      const response = await axios.get('http://localhost:3000/menu-items', {
-        params: {
-          category: selectedCategory || undefined,
-        },
-      });
-      setMenuItems(response.data);
-      setFilteredItems(response.data); // กำหนดรายการเมนูที่กรองแล้ว
+      const response = await fetch(`http://localhost:3000/menu-items?search=${encodeURIComponent(search)}`);
+      const data = await response.json();
+      setMenuItems(data);
+      setFilteredItems(data); // อัปเดตค่าเริ่มต้นของรายการที่ค้นหาได้
     } catch (error) {
       console.error('Error fetching menu items:', error);
     }
   };
 
-  const handleEditClick = (menu) => {
-    setSelectedMenu(menu);
-    setIsEditPopupOpen(true);
+
+  const handleEditClick = (item) => {
+    setEditingItem(item);
   };
 
   const handlePopupClose = () => {
     setIsEditPopupOpen(false);
     setSelectedMenu(null);
   };
-  const handleMenuUpdate = async (updatedMenu) => {
+  const handleUpdateMenuItem = async (updatedItem) => {
+    const formData = new FormData();
+    formData.append('name', updatedItem.name);
+    formData.append('price', updatedItem.price);
+    formData.append('category', updatedItem.category);
+    if (updatedItem.image instanceof File) {
+      formData.append('image', updatedItem.image);
+    }
+
     try {
-      await axios.put(`http://localhost:3000/menu-items/${updatedMenu.id}`, updatedMenu);
-      fetchMenuItems(); // อัปเดตรายการเมนูใหม่
-      setIsEditPopupOpen(false);
+      const response = await fetch(`http://localhost:3000/menu-items/${updatedItem.id}`, {
+        method: 'PUT',
+        body: formData,
+      });
+
+      if (response.ok) {
+        const updatedMenuItem = await response.json();
+        setMenuItems((prev) =>
+          prev.map((item) => (item.id === updatedMenuItem.id ? updatedMenuItem : item))
+        );
+        setEditingItem(null); // Close the popup
+      } else {
+        console.error('Failed to update menu item');
+      }
     } catch (error) {
       console.error('Error updating menu item:', error);
     }
   };
 
+
+
   const handleSearch = () => {
-    const filtered = menuItems.filter((item) =>
-      item.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setFilteredItems(filtered);
+    fetchMenuItems(searchQuery); // ดึงข้อมูลใหม่จาก API ตามค่าค้นหา
   };
+
 
   // จัดกลุ่มเมนูตามหมวดหมู่
   const groupedMenuItems = filteredItems.reduce((acc, item) => {
@@ -74,8 +114,15 @@ function MenuList() {
 
   const deleteMenuItem = async (id) => {
     try {
-      await axios.delete(`http://localhost:3000/menu-items/${id}`);
-      fetchMenuItems();
+      const response = await fetch(`http://localhost:3000/menu-items/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setMenuItems((prev) => prev.filter((item) => item.id !== id));
+      } else {
+        console.error('Failed to delete menu item');
+      }
     } catch (error) {
       console.error('Error deleting menu item:', error);
     }
@@ -128,18 +175,18 @@ function MenuList() {
           หมวดหมู่:
         </label>
         <select
-          id="category"
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring focus:border-blue-300"
-        >
-          <option value="">ทั้งหมด</option>
-          {categories.map((category) => (
-            <option key={category} value={category}>
-              {category}
-            </option>
-          ))}
-        </select>
+    id="category"
+    value={selectedCategory}
+    onChange={handleCategoryChange}
+    className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+  >
+    <option value="">ทั้งหมด</option>
+    {categories.map((category) => (
+      <option key={category} value={category}>
+        {category}
+      </option>
+    ))}
+  </select>
       </div>
 
       {/* แสดงเมนู */}
@@ -172,45 +219,62 @@ function MenuList() {
 
 
       {/* แสดงเมนูที่จัดกลุ่มตามหมวดหมู่ */}
-      {Object.keys(groupedMenuItems).map((category) => (
-        <div key={category} className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">{category}</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {groupedMenuItems[category].map((item) => (
-              <div
-                key={item.id}
-                className="border border-gray-200 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300"
-              >
-                <img
-                  src={`http://localhost:3000/${item.image}`}
-                  alt={item.name}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-4">
-                  <h2 className="text-2xl font-bold text-gray-800">{item.name}</h2>
-                  <p className="text-gray-600 text-lg mt-2">{item.price.toFixed(2)} บาท</p>
-                  <p className="text-gray-500 text-sm mt-1">หมวดหมู่: {item.category}</p>
-                  <div className="mt-4 flex space-x-2">
-                    <button
-                      onClick={() => handleEditClick(item)}
-                      className="bg-yellow-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-yellow-600 transition-colors duration-300"
-                    >
-                      แก้ไข
-                    </button>
-
-                    <button
-                      onClick={() => deleteMenuItem(item.id)}
-                      className="bg-red-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-600 transition-colors duration-300"
-                    >
-                      ลบ
-                    </button>
+      <div className="container mx-auto p-4">
+        {Object.keys(
+          filteredItems.reduce((acc, item) => {
+            acc[item.category] = acc[item.category] || [];
+            acc[item.category].push(item);
+            return acc;
+          }, {})
+        ).map((category) => (
+          <div key={category} className="mb-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">{category}</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {filteredItems
+                .filter((item) => item.category === category)
+                .map((item) => (
+                  <div
+                    key={item.id}
+                    className="border border-gray-200 rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300"
+                  >
+                    <img
+                      src={`http://localhost:3000/${item.image}?timestamp=${new Date().getTime()}`}
+                      alt={item.name}
+                      className="w-full h-48 object-cover"
+                    />
+                    <div className="p-4">
+                      <h2 className="text-xl font-bold text-gray-800">{item.name}</h2>
+                      <p className="text-gray-600 text-lg mt-2">{item.price.toFixed(2)} บาท</p>
+                      <p className="text-gray-500 text-sm mt-1">หมวดหมู่: {item.category}</p>
+                      <div className="mt-4 flex space-x-2">
+                        <button
+                          onClick={() => handleEditClick(item)}
+                          className="bg-yellow-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-yellow-600 transition-colors duration-300"
+                        >
+                          แก้ไข
+                        </button>
+                        <button
+                          onClick={() => deleteMenuItem(item.id)}
+                          className="bg-red-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-600 transition-colors duration-300"
+                        >
+                          ลบ
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            ))}
+                ))}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+
+        {editingItem && (
+          <EditMenuPopup
+            menu={editingItem}
+            onClose={() => setEditingItem(null)}
+            onUpdate={handleUpdateMenuItem}
+          />
+        )}
+      </div>
     </div>
   );
 }

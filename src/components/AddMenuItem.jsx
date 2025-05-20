@@ -6,7 +6,8 @@ function AddMenuItem() {
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [image, setImage] = useState(null);
-  const [category, setCategory] = useState(''); // Add category state
+  const [category, setCategory] = useState('');
+  const [previewImage, setPreviewImage] = useState(null); // State for previewing the image
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -15,13 +16,29 @@ function AddMenuItem() {
     formData.append('name', name);
     formData.append('price', price);
     formData.append('image', image);
-    formData.append('category', category); // Include category in the form data
+    formData.append('category', category);
 
     try {
       await axios.post('http://localhost:3000/menu-items', formData);
       navigate('/');
     } catch (error) {
       console.error('Error adding menu item:', error);
+    }
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    setImage(file);
+
+    // Create a preview URL for the selected image
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setPreviewImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setPreviewImage(null);
     }
   };
 
@@ -74,10 +91,16 @@ function AddMenuItem() {
           <label className="block text-gray-700 font-medium mb-2">อัปโหลดรูปภาพ</label>
           <input
             type="file"
-            onChange={(e) => setImage(e.target.files[0])}
+            onChange={handleImageChange}
             className="w-full text-gray-700 border border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-brown-500"
             required
           />
+          {previewImage && (
+            <div className="mt-4">
+              <p className="text-gray-600">ตัวอย่างรูปภาพ:</p>
+              <img src={previewImage} alt="Preview" className="w-full h-48 object-cover mt-2 rounded-md" />
+            </div>
+          )}
         </div>
 
         <button

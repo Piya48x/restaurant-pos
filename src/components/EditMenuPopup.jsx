@@ -4,10 +4,24 @@ function EditMenuPopup({ menu, onClose, onUpdate }) {
   const [name, setName] = useState(menu.name);
   const [price, setPrice] = useState(menu.price);
   const [category, setCategory] = useState(menu.category);
+  const [image, setImage] = useState(menu.image || ''); // เริ่มต้นด้วยรูปเดิมหรือค่าว่าง
+  const [previewImage, setPreviewImage] = useState(menu.image || ''); // รูป preview
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImage(file);
+      const reader = new FileReader();
+      reader.onload = () => setPreviewImage(reader.result);
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const updatedMenu = { ...menu, name, price, category };
+
+    // สร้าง object ของเมนูที่แก้ไข
+    const updatedMenu = { ...menu, name, price, category, image };
     onUpdate(updatedMenu);
   };
 
@@ -51,6 +65,21 @@ function EditMenuPopup({ menu, onClose, onUpdate }) {
               <option value="ไอศกรีม">ไอศกรีม</option>
               <option value="ของมัน">ของมัน</option>
             </select>
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700">เปลี่ยนรูปภาพ</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="w-full border p-2 rounded"
+            />
+            {previewImage && (
+              <div className="mt-2">
+                <p className="text-gray-600">ตัวอย่างรูปภาพ:</p>
+                <img src={previewImage} alt="Preview" className="w-full h-32 object-cover mt-2 rounded" />
+              </div>
+            )}
           </div>
           <div className="flex justify-end space-x-2">
             <button

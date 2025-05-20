@@ -16,12 +16,12 @@ function Navbar() {
         >
           เมนู
         </Link>
-        <Link 
+        {/* <Link 
           to="/add" 
           className="transition-colors duration-200 hover:text-yellow-400 hover:underline focus:text-yellow-400"
         >
           เพิ่มเมนู
-        </Link>
+        </Link> */}
         <Link 
           to="/order" 
           className="transition-colors duration-200 hover:text-yellow-400 hover:underline focus:text-yellow-400"
@@ -39,6 +39,12 @@ function Navbar() {
           className="transition-colors duration-200 hover:text-yellow-400 hover:underline focus:text-yellow-400"
         >
           ติดต่อเรา
+        </Link>
+        <Link 
+          to="/TradingChart" 
+          className="transition-colors duration-200 hover:text-yellow-400 hover:underline focus:text-yellow-400"
+        >
+          เทรด
         </Link>
         {/* <Link 
           to="/login" 
