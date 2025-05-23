@@ -5,8 +5,9 @@ function OrderPage() {
   const [menuItems, setMenuItems] = useState([]);
   const [orderItems, setOrderItems] = useState([]);
   const [showBill, setShowBill] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(""); // สำหรับเลือกหมวดหมู่
-  const VAT_RATE = 0.07; // 7% VAT
+  const [cartVisible, setCartVisible] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const VAT_RATE = 0.07;
 
   useEffect(() => {
     fetchMenuItems();
@@ -65,12 +66,11 @@ function OrderPage() {
     document.body.innerHTML = billContent;
     window.print();
     document.body.innerHTML = originalContent;
-    window.location.reload(); // รีโหลดหน้าหลังพิมพ์
+    window.location.reload();
   };
 
-  // Group menu items by category
   const groupedMenuItems = menuItems.reduce((acc, item) => {
-    const category = item.category || "อื่นๆ"; // ใช้ "อื่นๆ" ถ้าไม่มี category
+    const category = item.category || "อื่นๆ";
     if (!acc[category]) {
       acc[category] = [];
     }
@@ -79,8 +79,19 @@ function OrderPage() {
   }, {});
 
   return (
-    <div className="container mx-auto px-4 py-6">
+    <div className="relative container mx-auto px-4 py-6">
       <h1 className="text-3xl font-bold text-gray-800 mb-6">เมนูอาหาร</h1>
+
+      {/* ปุ่มเปิด/ปิดตะกร้า */}
+     {orderItems.length > 0 && (
+  <button
+    onClick={() => setCartVisible(!cartVisible)}
+    className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white font-semibold py-3 px-6 rounded-full shadow-lg hover:bg-blue-700 transition-all z-40"
+  >
+    {cartVisible ? "ปิดตะกร้า" : `ดูออเดอร์ของคุณ (${orderItems.length})`}
+  </button>
+)}
+
 
       {/* ตัวกรองหมวดหมู่ */}
       <div className="mb-6">
@@ -98,12 +109,14 @@ function OrderPage() {
         </select>
       </div>
 
-      {/* แสดงเมนูอาหารตามหมวดหมู่ */}
+      {/* รายการเมนูอาหาร */}
       {Object.keys(groupedMenuItems).map(
         (category) =>
           (selectedCategory === "" || selectedCategory === category) && (
             <div key={category} className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">{category}</h2>
+              <h2 className="text-2xl font-bold text-gray-800 mb-2 border-b-4 border-blue-300 pb-2">
+                {category}
+              </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {groupedMenuItems[category].map((item) => (
                   <div
@@ -133,72 +146,83 @@ function OrderPage() {
           )
       )}
 
-      {/* ตะกร้าสินค้า */}
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-2xl font-bold mb-6 text-gray-800">ตะกร้าสินค้า</h2>
-        {orderItems.length === 0 ? (
-          <p className="text-gray-600 text-center">ไม่มีรายการในตะกร้า</p>
-        ) : (
-          <div>
-            {orderItems.map((order) => (
-              <div
-                key={order.id}
-                className="flex items-center justify-between border-b border-gray-150 py-4 mb-4"
-              >
-                <div className="flex-1">
-                  <h3 className="text-lg font-bold text-gray-800">{order.name}</h3>
-                  <p className="text-gray-600">{order.price.toFixed(2)} บาท</p>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <button
-                    onClick={() =>
-                      order.quantity > 1
-                        ? editOrderQuantity(order.id, order.quantity - 1)
-                        : removeFromOrder(order.id)
-                    }
-                    className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-1 px-3 rounded-md"
-                  >
-                    -
-                  </button>
-                  <span className="text-lg font-bold text-gray-800">
-                    {order.quantity}
-                  </span>
-                  <button
-                    onClick={() => editOrderQuantity(order.id, order.quantity + 1)}
-                    className="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-md"
-                  >
-                    +
-                  </button>
-                </div>
-                <button
-                  onClick={() => removeFromOrder(order.id)}
-                  className="bg-red-500 text-white font-bold px-4 py-2 rounded-lg hover:bg-red-600 ml-4"
-                >
-                  ลบ
-                </button>
-              </div>
-            ))}
-
-            {/* สรุปยอด */}
-            <div className="mt-6 border-t pt-4">
-              <p className="text-gray-700">ยอดรวม: {subtotal.toFixed(2)} บาท</p>
-              <p className="text-gray-700">VAT (7%): {vat.toFixed(2)} บาท</p>
-              <p className="text-xl font-bold text-gray-800">ราคาสุทธิ: {total.toFixed(2)} บาท</p>
+      {/* ตะกร้าสินค้าเป็น Side Panel */}
+{cartVisible && (
+  <div className="fixed bottom-0 left-0 w-full sm:max-w-md sm:bottom-4 sm:left-1/2 sm:-translate-x-1/2 bg-white shadow-2xl p-6 z-50 rounded-t-2xl max-h-[90vh] overflow-y-auto transition-all duration-300">
+     {/* ปุ่มปิด (X) */}
+    <button
+      onClick={() => setCartVisible(false)}
+      className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl font-bold"
+      aria-label="Close cart"
+    >
+      ×
+    </button>
+    <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">ตะกร้าสินค้า</h2>
+    {orderItems.length === 0 ? (
+      <p className="text-gray-600 text-center">ไม่มีรายการในตะกร้า</p>
+    ) : (
+      <div>
+        {orderItems.map((order) => (
+          <div
+            key={order.id}
+            className="flex items-center justify-between border-b border-gray-150 py-4 mb-4"
+          >
+            <div className="flex-1">
+              <h3 className="text-lg font-bold text-gray-800">{order.name}</h3>
+              <p className="text-gray-600">{order.price.toFixed(2)} บาท</p>
+            </div>
+            <div className="flex items-center space-x-4">
               <button
-                onClick={() => setShowBill(true)}
-                className="bg-blue-500 text-white px-6 py-3 mt-6 rounded-lg w-full hover:bg-blue-600"
+                onClick={() =>
+                  order.quantity > 1
+                    ? editOrderQuantity(order.id, order.quantity - 1)
+                    : removeFromOrder(order.id)
+                }
+                className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-1 px-3 rounded-md"
               >
-                สรุปบิล & ปริ้น
+                -
+              </button>
+              <span className="text-lg font-bold text-gray-800">
+                {order.quantity}
+              </span>
+              <button
+                onClick={() => editOrderQuantity(order.id, order.quantity + 1)}
+                className="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-3 rounded-md"
+              >
+                +
               </button>
             </div>
+            <button
+              onClick={() => removeFromOrder(order.id)}
+              className="bg-red-500 text-white font-bold px-4 py-2 rounded-lg hover:bg-red-600 ml-4"
+            >
+              ลบ
+            </button>
           </div>
-        )}
+        ))}
+
+        <div className="mt-6 border-t pt-4">
+          <p className="text-gray-700">ยอดรวม: {subtotal.toFixed(2)} บาท</p>
+          <p className="text-gray-700">VAT (7%): {vat.toFixed(2)} บาท</p>
+          <p className="text-xl font-bold text-gray-800">ราคาสุทธิ: {total.toFixed(2)} บาท</p>
+          <button
+            onClick={() => setShowBill(true)}
+            className="bg-blue-500 text-white px-6 py-3 mt-6 rounded-lg w-full hover:bg-blue-600"
+          >
+            สรุปบิล & ปริ้น
+          </button>
+        </div>
       </div>
+    )}
+  </div>
+)}
+
+
 
       {/* ป๊อปอัปบิล */}
       {showBill && (
         <div
-          className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center"
+          className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50"
           id="bill-content"
         >
           <div className="bg-white rounded-lg shadow-lg p-6 w-96">
